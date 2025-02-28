@@ -1,10 +1,11 @@
-const User = require("../models/UserModel.js");
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 const bcrypt = require("bcrypt");
-const jwt_secret = process.env.JWT_SECRET
+const jwt = require('jsonwebtoken');
+const jwt_secret = process.env.JWT_SECRET;
 
 
+// Rotas públicas
 exports.renderHome = (req, res) => {
   res.render('home.html');
 };
@@ -17,6 +18,7 @@ exports.getlogin = (req, res) => {
   res.render('login');
 };
 
+// Rotas privadas
 exports.getUsers = async (req, res) => {
   try {
     const users = await prisma.user.findMany();
@@ -26,7 +28,7 @@ exports.getUsers = async (req, res) => {
   }
 };
 
-
+// Registrar usuário
 exports.register = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -52,12 +54,13 @@ exports.register = async (req, res) => {
     const token = jwt.sign({ id: user.id }, jwt_secret, { expiresIn: "1h" });
 
     console.log(user);
-    res.status(201).render('login').json({ token });
+    res.status(201).json({ token }); // Envia o token como resposta JSON
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
 };
 
+// Login do usuário
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -78,17 +81,25 @@ exports.login = async (req, res) => {
       return res.status(400).render('login', { error: 'Senha inválida' });
     }
 
+    const token = jwt.sign({ id: user.id }, jwt_secret, { expiresIn: "1h" });
+
     console.log('Login bem-sucedido:', user);
-    res.status(200).render('Page');
+    res.status(200).json({ token }); // Envia o token como resposta JSON
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
+// Deletar todos os usuários (protegido)
 exports.deletedUserAll = async (req, res) => {
   try {
+    const users = await prisma.user.findMany();
+    if (users.length === 0) {
+      return res.status(404).json({ message: 'Nenhum usuário encontrado para deletar.' });
+    }
+
     await prisma.user.deleteMany();
-    res.status(200).json({ message: 'All users have been deleted.' });
+    res.status(200).json({ message: 'Todos os usuários foram deletados.' });
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
