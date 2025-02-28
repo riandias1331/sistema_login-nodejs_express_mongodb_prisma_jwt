@@ -54,7 +54,7 @@ exports.register = async (req, res) => {
     const token = jwt.sign({ id: user.id }, jwt_secret, { expiresIn: "1h" });
 
     console.log(user);
-    res.status(201).json({ token }); // Envia o token como resposta JSON
+    res.status(201).json({ token }); 
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
@@ -84,7 +84,7 @@ exports.login = async (req, res) => {
     const token = jwt.sign({ id: user.id }, jwt_secret, { expiresIn: "1h" });
 
     console.log('Login bem-sucedido:', user);
-    res.status(200).json({ token }); // Envia o token como resposta JSON
+    res.status(200).json({ token }); 
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
