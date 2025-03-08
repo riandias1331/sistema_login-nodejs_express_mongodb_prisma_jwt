@@ -5,6 +5,9 @@ const auth = require("./src/middlwares/auth.js");
 
 // Rotas privadas (requerem autenticação)
 router.get("/users", auth.authenticateToken, Controller.getUsers); 
+router.delete("/users", auth.authenticateToken, Controller.deletedUserAll); // Adicionada proteção JWT
+
+
 
 // Rotas públicas
 router.get("/", Controller.renderHome);

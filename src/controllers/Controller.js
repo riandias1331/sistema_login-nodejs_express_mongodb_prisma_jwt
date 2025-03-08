@@ -51,16 +51,15 @@ exports.register = async (req, res) => {
       },
     });
 
-    const token = jwt.sign({ id: user.id }, jwt_secret, { expiresIn: "1h" });
-
     console.log(user);
-    res.status(201).json({ token }); 
+    // Redirecionar para a página de login após o registro
+    res.status(201).redirect('/login'); 
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
 };
 
-// Login do usuário
+// Login
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -71,7 +70,7 @@ exports.login = async (req, res) => {
 
     if (!user) {
       console.log('Usuário não encontrado');
-      return res.status(400).render('register', { error: 'Usuário não encontrado' });
+      return res.status(400).render('login', { error: 'Usuário não encontrado' });
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
@@ -84,11 +83,14 @@ exports.login = async (req, res) => {
     const token = jwt.sign({ id: user.id }, jwt_secret, { expiresIn: "1h" });
 
     console.log('Login bem-sucedido:', user);
-    res.status(200).json({ token }); 
+    // Renderizar a página 'Page' após o login bem-sucedido
+    res.render('Page', { token });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
+
+
 
 // Deletar todos os usuários (protegido)
 exports.deletedUserAll = async (req, res) => {
@@ -104,3 +106,7 @@ exports.deletedUserAll = async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 };
+
+
+
+
