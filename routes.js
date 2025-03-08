@@ -4,7 +4,7 @@ const Controller = require("./src/controllers/Controller.js");
 const auth = require("./src/middlwares/auth.js"); 
 
 // Rotas privadas (requerem autenticação)
-router.get("/users", auth, Controller.getUsers); 
+router.get("/users", auth.authenticateToken, Controller.getUsers); 
 
 // Rotas públicas
 router.get("/", Controller.renderHome);
